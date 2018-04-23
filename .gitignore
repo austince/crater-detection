@@ -51,3 +51,5 @@ target/
 *.pdf
 docs/
 exportToHTML
+
+output*
