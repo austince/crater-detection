@@ -9,8 +9,8 @@ class Crater:
     """
     def __init__(self, contour):
         self.contour = contour
-        (x, y), rad = self.min_enclosing_circle()
-        self.pos = np.array([x, y])
+        # (x, y), rad = self.min_enclosing_circle()
+        # self.pos = np.array([x, y])
         self.children = []
 
     def contains_point(self, pt: Tuple[float, float]) -> bool:
