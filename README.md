@@ -1,7 +1,7 @@
 # Crater Detection
 **Austin Cawley-Edwards  
 Stevens Institute of Technology  
-PEP 353: Intro to Astrophysics
+PEP 336: Intro to Astrophysics
 Prof. Vlad Lukic**
 
 
