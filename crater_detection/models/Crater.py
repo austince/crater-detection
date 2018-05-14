@@ -1,7 +1,7 @@
 from typing import Tuple
 import cv2 as cv
 import numpy as np
-from ..util import angle_between
+from ..util import angle_between_points, angle_between_with_origin
 
 
 class Crater:
@@ -13,9 +13,15 @@ class Crater:
         self.full_contour = combinded_c
 
     def sun_angle(self) -> np.real:
-        low_pos, low_rad = cv.minEnclosingCircle(self.low_contour)
         high_pos, high_rad = cv.minEnclosingCircle(self.high_contour)
-        return angle_between(low_pos, high_pos)
+        low_pos, low_rad = cv.minEnclosingCircle(self.low_contour)
+
+        low_pos = np.uint(np.around(low_pos))
+        high_pos = np.uint(np.around(high_pos))
+
+        btw_circles = angle_between_points(high_pos, low_pos)
+
+        return btw_circles
 
     def radius(self) -> np.real:
         pos, rad = self.min_enclosing_circle()

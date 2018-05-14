@@ -3,9 +3,8 @@ import cv2 as cv
 from typing import Tuple, List, Any
 from scipy.spatial import distance
 from scipy.signal import argrelmax
-from matplotlib import pyplot as plt
 
-from ..util import logger
+from ..util import logger, angle_between_points
 from crater_detection.models import Crater, CraterField
 
 OUTLINE_COLOR = (0, 255, 0)
@@ -82,11 +81,9 @@ def detect(input_image: np.ndarray) -> Tuple[np.ndarray, CraterField]:
     else:
         bw_img = cv.cvtColor(input_image, cv.COLOR_BGR2GRAY)
 
-    craters = []
-
-    logger.info("Finding circles")
-    circles = [] # find_circles(bw_img)
-    logger.info("Found %i total circles" % len(circles))
+    # logger.info("Finding circles")
+    # circles = [] # find_circles(bw_img)
+    # logger.info("Found %i total circles" % len(circles))
 
     min_val, max_val = get_peak_values(bw_img)
     logger.debug("Lowest img value:", np.min(bw_img))
@@ -117,10 +114,6 @@ def detect(input_image: np.ndarray) -> Tuple[np.ndarray, CraterField]:
     # closed = close_image(thresh_image)
     # clean_image(thresh_image)
 
-    # Create crater tree
-    logger.info("Creating Crater list")
-    # craters = list(map(lambda cont: Crater(cont), contours))
-
     # Pair high and low contours
     # for each high contour, find the closest low contour by center
     def mapper(c):
@@ -149,9 +142,8 @@ def detect(input_image: np.ndarray) -> Tuple[np.ndarray, CraterField]:
     dists = np.zeros(shape=(len(high_contours), len(low_contours)))
     h_matches = np.ndarray(shape=(len(high_contours),), dtype=np.uint)
     l_matches = np.ndarray(shape=(len(low_contours),), dtype=np.uint)
-    combinded = []
     craters = []
-    logger.debug("Matching")
+    logger.debug("Matching high and low crater pairs")
     for h_i, h in enumerate(high_contours):
         for l_i, l in enumerate(low_contours):
             dists[h_i][l_i] = distance_between_contours(h, l)
@@ -161,7 +153,6 @@ def detect(input_image: np.ndarray) -> Tuple[np.ndarray, CraterField]:
         h_matches[h_i] = int(min_ind)
         l_matches[min_ind] = h_i
         full_contour = np.append(high_contours[h_i], low_contours[min_ind], axis=0)
-        combinded.append(full_contour)
         craters.append(Crater(high_contours[h_i], low_contours[min_ind], full_contour))
 
 
@@ -175,9 +166,9 @@ def detect(input_image: np.ndarray) -> Tuple[np.ndarray, CraterField]:
     # cv.drawContours(color_image, combinded, -1, (0, 255, 0), 2)
     cv.drawContours(color_image, list(map(lambda c: c.full_contour, craters)), -1, (0, 255, 0), 2)
 
-    logger.info("Drawing circles")
-    for circle in circles:
-        cv.circle(color_image, (circle[0], circle[1]), circle[2], (0, 255, 0), 2)
+    # logger.info("Drawing circles")
+    # for circle in circles:
+    #     cv.circle(color_image, (circle[0], circle[1]), circle[2], (0, 255, 0), 2)
 
     logger.info("Drawing contour connections")
     for h_i, l_i in enumerate(h_matches):

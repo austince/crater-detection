@@ -23,7 +23,15 @@ def run_detector(args):
     misc.imsave(out_filename, output_image)
     logger.info('Done! Saved to:', out_filename, color='green')
 
-    logger.info(crater_field.stats())
+    stats = crater_field.stats()
+    logger.info("Crater stats:", color='green')
+    logger.info("Width:", stats["width"])
+    logger.info("Height:", stats["height"])
+    logger.info("Number of Craters:", stats["num_craters"])
+    logger.info("Max Radius:", stats["max_rad"])
+    logger.info("Min Radius:", stats["min_rad"])
+    logger.info("Average Radius:", stats["mean_rad"])
+    logger.info("Average Sun Angle (degrees):", stats["sun_angle_degrees"])
 
     if args.display_output:
         misc.imshow(output_image)
