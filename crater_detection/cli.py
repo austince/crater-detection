@@ -6,14 +6,14 @@ import os
 import sys
 from scipy import misc
 from . import __version__
-from .lunar import detector, generator
+from . import detector, generator
 from .util import logger
 
 
 def run_detector(args):
     _, image_filename = os.path.split(args.input)
     input_image = misc.imread(args.input)
-    output_image, craters = detector.detect(input_image)
+    output_image, crater_field = detector.detect(input_image)
 
     if args.output is not None:
         out_filename = args.output
@@ -21,10 +21,11 @@ def run_detector(args):
         out_filename = 'output-%s' % image_filename
 
     misc.imsave(out_filename, output_image)
-    logger.info('Done!', color='green')
+    logger.info('Done! Saved to:', out_filename, color='green')
+
+    logger.info(crater_field.stats())
 
     if args.display_output:
-        logger.info("Number of Craters:", len(craters))
         misc.imshow(output_image)
 
 
