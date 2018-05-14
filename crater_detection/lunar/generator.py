@@ -29,15 +29,14 @@ def generate(num_craters=NCraters,
              alpha=Alpha,
              sun_angle=SunAngle):
     """
-    Todo: implement sun angle
     :param num_craters:
-    :param width:
-    :param height:
-    :param min_radius:
-    :param max_radius:
+    :param width: in px
+    :param height: in px
+    :param min_radius: in px
+    :param max_radius: in px
     :param shadow_factor:
     :param alpha:
-    :param sun_angle:
+    :param sun_angle: in degrees
     :return:
     """
     output_img = np.full([height, width, 3], BG_COLOR, dtype=np.uint8)
@@ -55,13 +54,14 @@ def generate(num_craters=NCraters,
         crater_size = np.floor(crater_real)
 
         # draw light -> gray -> dark
-        crater_offset_x = int(np.round(crater_size / shadow_factor))
-        crater_offset_y = int(np.round(crater_size / shadow_factor))
+        angle_rad = np.deg2rad(sun_angle)
+        crater_offset_x = np.cos(angle_rad) * int(np.round(crater_size / shadow_factor))
+        crater_offset_y = np.sin(angle_rad) * int(np.round(crater_size / shadow_factor))
         crater_radius = int(np.round(crater_size - (crater_size / shadow_factor / 2)))
 
         # Light
         cv.circle(output_img,
-                  (int(crater_x - crater_offset_x), crater_y),
+                  (int(crater_x - crater_offset_x), int(crater_y - crater_offset_y)),
                   crater_radius,
                   LIGHT_COLOR,
                   cv.FILLED,
@@ -70,7 +70,7 @@ def generate(num_craters=NCraters,
 
         # Shadow
         cv.circle(output_img,
-                  (int(crater_x + crater_offset_x), crater_y),
+                  (int(crater_x + crater_offset_x), int(crater_y + crater_offset_y)),
                   crater_radius,
                   SHADOW_COLOR,
                   cv.FILLED,

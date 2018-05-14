@@ -123,11 +123,11 @@ def main():
                                  default=generator.NCraters,
                                  type=int)
     generate_parser.add_argument('--min-rad',
-                                 help="Min radius of a crater.",
+                                 help="Min radius of a crater (px).",
                                  default=generator.MinCrater,
                                  type=int)
     generate_parser.add_argument('--max-rad',
-                                 help="Max radius of a crater.",
+                                 help="Max radius of a crater (px).",
                                  default=generator.MaxCrater,
                                  type=int)
     generate_parser.add_argument('--shadow-factor',
@@ -140,7 +140,7 @@ def main():
                                  type=int)
 
     generate_parser.add_argument('-a', '--angle',
-                                 help="Angle of sun.",
+                                 help="Angle of sun (degrees).",
                                  default=generator.Alpha,
                                  type=int)
 
