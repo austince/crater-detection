@@ -8,8 +8,8 @@ def unit_vector(vector):
 
 
 def angle_between_points(p1, p2):
-    delta_x = np.longlong(p1[0]) - np.longlong(p2[0])
-    delta_y = np.longlong(p1[1]) - np.longlong(p2[1])
+    delta_x = p1[0] - p2[0]
+    delta_y = p1[1] - p2[1]
     theta_radians = np.arctan2(delta_y, delta_x)
     return theta_radians
 
