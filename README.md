@@ -41,9 +41,13 @@ with an angle of 35 degrees, and saves it to `test.png`.
 $ crater-detect generate --verbose --rand-seed 1 --num-craters 25 --max-rad 30 --min-rad 10 --angle 35 -o test.png
 ```
 
+![](./outputs/final/test.png)
+
 ### Detect
 Runs detection on generated `test.png`, logs the output, and saves the output picture to `output.png`.
 
 ```bash
 $ crater-detect detect -i test.png --verbose -o output.png 
 ```
+
+![](./outputs/final/output-test.png)
