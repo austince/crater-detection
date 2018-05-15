@@ -18,7 +18,7 @@ def run_detector(args):
     if args.output is not None:
         out_filename = args.output
     else:
-        out_filename = 'output-%s' % image_filename
+        out_filename = f'output-{image_filename}'
 
     misc.imsave(out_filename, output_image)
     logger.info('Done! Saved to:', out_filename, color='green')
@@ -49,7 +49,7 @@ def detector_error_handler(ex, args):
 
 
 def run_generator(args):
-    output_image = generator.generate(
+    output_image, stats = generator.generate(
         num_craters=args.num_craters,
         width=args.width,
         height=args.height,
@@ -58,6 +58,7 @@ def run_generator(args):
         shadow_factor=args.shadow_factor,
         alpha=args.alpha,
         sun_angle=args.angle,
+        rand_seed=args.rand_seed,
     )
 
     if args.display_output:
@@ -70,6 +71,17 @@ def run_generator(args):
 
     misc.imsave(out_filename, output_image)
     logger.info('Done!', color='green')
+
+    logger.info('Generated field stats:')
+    logger.info("Width:", stats["width"])
+    logger.info("Height:", stats["height"])
+    logger.info("Number of Craters:", stats["num_craters"])
+    logger.info("Max Radius:", stats["max_rad"])
+    logger.info("Min Radius:", stats["min_rad"])
+    logger.info("Average Radius:", stats["mean_rad"])
+    logger.info("Sun Angle (degrees):", stats["sun_angle_degrees"])
+    logger.info("Shadow Factor:", stats["shadow_factor"])
+    logger.info("Alpha:", stats["alpha"])
 
 
 def generator_error_handler(ex, args):
@@ -101,8 +113,8 @@ def main():
     """
     parser = argparse.ArgumentParser(description='Lunar Crater Detection')
     parser.add_argument('-V', '--version', action='version', version=__version__)
-    parser.set_defaults(cmd=run_detector)
-    parser.set_defaults(error_handler=detector_error_handler)
+    parser.set_defaults(cmd=None)
+    parser.set_defaults(error_handler=None)
 
     # Sub parsers
     subparsers = parser.add_subparsers(help='Crater functions.')
@@ -147,15 +159,22 @@ def main():
                                  help="Crater Alpha.",
                                  default=generator.Alpha,
                                  type=int)
-
+    generate_parser.add_argument('-rs', '--rand-seed',
+                                 help="Random seed for the number generator.",
+                                 default=None,
+                                 type=int)
     generate_parser.add_argument('-a', '--angle',
                                  help="Angle of sun (degrees).",
-                                 default=generator.Alpha,
+                                 default=generator.SunAngle,
                                  type=int)
 
     add_common_args(generate_parser)
 
     args = parser.parse_args()
+
+    if args.cmd is None:
+        parser.print_usage()
+        sys.exit(1)
 
     logger.set_enabled(args.verbose)
 

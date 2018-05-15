@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+from typing import Tuple, Dict
 
 __all__ = ["generate"]
 
@@ -20,14 +21,15 @@ LIGHT_COLOR = (255, 255, 255)
 BG_COLOR = (100, 100, 100)
 
 
-def generate(num_craters=NCraters,
-             width=FieldX,
-             height=FieldY,
-             min_radius=MinCrater,
-             max_radius=MaxCrater,
-             shadow_factor=CraterShadowFactor,
-             alpha=Alpha,
-             sun_angle=SunAngle):
+def generate(num_craters: int = NCraters,
+             width: int=FieldX,
+             height: int=FieldY,
+             min_radius: float=MinCrater,
+             max_radius: float=MaxCrater,
+             shadow_factor: float=CraterShadowFactor,
+             alpha: float=Alpha,
+             rand_seed = None,
+             sun_angle: float=SunAngle) -> Tuple[np.ndarray, Dict]:
     """
     :param num_craters:
     :param width: in px
@@ -39,7 +41,15 @@ def generate(num_craters=NCraters,
     :param sun_angle: in degrees
     :return:
     """
+    if rand_seed is not None:
+        np.random.seed(rand_seed)
+
     output_img = np.full([height, width, 3], BG_COLOR, dtype=np.uint8)
+    output_radii = []
+
+    angle_rad = np.deg2rad(sun_angle)
+    crater_a = min_radius ** (Alpha + 1)
+    crater_b = max_radius ** (Alpha + 1) - crater_a
 
     for i in range(num_craters):
         crater_x = np.random.randint(0, width)
@@ -47,17 +57,15 @@ def generate(num_craters=NCraters,
 
         uni = np.random.uniform(0, 1)
 
-        crater_a = min_radius ** (Alpha + 1)
-        crater_b = max_radius ** (Alpha + 1) - crater_a
-
         crater_real = (crater_a + (crater_b * uni)) ** (1 / (1 + alpha))
         crater_size = np.floor(crater_real)
 
         # draw light -> gray -> dark
-        angle_rad = np.deg2rad(sun_angle)
         crater_offset_x = np.cos(angle_rad) * int(np.round(crater_size / shadow_factor))
         crater_offset_y = np.sin(angle_rad) * int(np.round(crater_size / shadow_factor))
         crater_radius = int(np.round(crater_size - (crater_size / shadow_factor / 2)))
+
+        output_radii.append(crater_radius)
 
         # Light
         cv.circle(output_img,
@@ -86,5 +94,17 @@ def generate(num_craters=NCraters,
                   cv.LINE_AA,  # line type
                   )
 
-    return output_img
+    raddi_arr = np.array(output_radii)
+    stats = {
+        "min_rad": np.min(raddi_arr),
+        "max_rad": np.max(raddi_arr),
+        "mean_rad": np.mean(raddi_arr),
+        "width": width,
+        "height": height,
+        "num_craters": num_craters,
+        "shadow_factor": shadow_factor,
+        "sun_angle_degrees": sun_angle,
+        "alpha": alpha,
+    }
 
+    return output_img, stats
