@@ -36,7 +36,7 @@ class RunTests(Command):
 setup(
     name='crater_detection',
     version=__version__,
-    description='basic lunar crater detection',
+    description='Basic lunar crater detection using Open CV',
     long_description=long_description,
     url='https://github.com/',
     author='austin ce',
